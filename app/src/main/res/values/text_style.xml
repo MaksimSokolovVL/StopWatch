@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <style name="MyTextStyle" parent="TextAppearance.MaterialComponents.Body1">
+        <item name="fontFamily">serif</item>
+        <item name="android:textSize">14sp</item>
+    </style>
+
+    <style name="MyTextStyle.H1">
+        <item name="android:textSize">35sp</item>
+        <item name="fontFamily">sans-serif-condensed-medium</item>
+        <item name="android:textStyle">bold</item>
+    </style>
+
+    <style name="MyTextStyle.Clock">
+        <item name="android:textSize">80sp</item>
+        <item name="android:textStyle">bold</item>
+    </style>
+</resources>
