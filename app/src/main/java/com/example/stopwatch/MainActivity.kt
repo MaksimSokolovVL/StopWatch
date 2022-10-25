@@ -7,10 +7,10 @@ import androidx.core.widget.ContentLoadingProgressBar
 import com.example.stopwatch.databinding.ActivityMainBinding
 import kotlinx.coroutines.*
 
-
 private const val MIN = 0f
 private const val MAX = 60f
 private val timerScope = CoroutineScope(Job() + Dispatchers.Main)
+private var job: Job? = null
 
 class MainActivity : AppCompatActivity() {
 
@@ -26,10 +26,10 @@ class MainActivity : AppCompatActivity() {
         binding.sliderBar.valueFrom = MIN
 
         binding.sliderBar.addOnChangeListener { _, value, _ ->
-            val g = value.toInt()
-            binding.textClock.text = g.toString()
-            progressBar.max = g
-            maxProcessBar = g
+            val counterTimeBar = value.toInt()
+            binding.textClock.text = counterTimeBar.toString()
+            progressBar.max = counterTimeBar
+            maxProcessBar = counterTimeBar
         }
 
         binding.buttonStart.setOnClickListener {
@@ -38,8 +38,7 @@ class MainActivity : AppCompatActivity() {
             binding.buttonPause.visibility = View.VISIBLE
             binding.buttonStop.visibility = View.VISIBLE
             binding.sliderBar.isEnabled = false
-            timeCounter(progressBar, binding)
-
+            job = timerScope.launch { timeCounter(progressBar, binding) }
         }
 
         var pause = 0
@@ -48,29 +47,36 @@ class MainActivity : AppCompatActivity() {
                 0 -> {
                     pause = 1
                     binding.buttonPause.text = getString(R.string.pause_resume)
-                    timerScope.cancel()
+                    job?.cancel()
                 }
                 1 -> {
                     pause = 0
                     binding.buttonPause.text = getString(R.string.button_pause)
-                    runBlocking {
-                        launch(Dispatchers.Main) {
-                            timeCounter(progressBar, binding)
-                        }
-                    }
+                    job = timerScope.launch { timeCounter(progressBar, binding) }
                 }
             }
         }
+
+        binding.buttonStop.setOnClickListener {
+            job?.cancel()
+            progressBar.progress = MIN.toInt()
+            binding.sliderBar.isEnabled = true
+            binding.buttonStart.visibility = View.VISIBLE
+            binding.buttonPause.visibility = View.GONE
+            binding.buttonStop.visibility = View.GONE
+            binding.sliderBar.value = MIN
+        }
     }
 
-    private fun timeCounter(progressBar: ContentLoadingProgressBar, binding: ActivityMainBinding) {
-        timerScope.launch {
-            repeat(maxProcessBar) {
-                delay(1000)
-                maxProcessBar--
-                progressBar.progress = maxProcessBar
-                binding.textClock.text = maxProcessBar.toString()
-            }
+    private suspend fun timeCounter(
+        progressBar: ContentLoadingProgressBar,
+        binding: ActivityMainBinding
+    ) {
+        repeat(maxProcessBar) {
+            delay(1000)
+            maxProcessBar--
+            progressBar.progress = maxProcessBar
+            binding.textClock.text = maxProcessBar.toString()
         }
     }
 }
