@@ -24,12 +24,14 @@ class MainActivity : AppCompatActivity() {
         val progressBar = binding.progressBar
         binding.sliderBar.valueTo = MAX
         binding.sliderBar.valueFrom = MIN
+        binding.buttonStart.isEnabled = false
 
         binding.sliderBar.addOnChangeListener { _, value, _ ->
             val counterTimeBar = value.toInt()
             binding.textClock.text = counterTimeBar.toString()
             progressBar.max = counterTimeBar
             maxProcessBar = counterTimeBar
+            binding.buttonStart.isEnabled = value != 0f
         }
 
         binding.buttonStart.setOnClickListener {
@@ -65,6 +67,8 @@ class MainActivity : AppCompatActivity() {
             binding.buttonPause.visibility = View.GONE
             binding.buttonStop.visibility = View.GONE
             binding.sliderBar.value = MIN
+            pause=0
+            binding.buttonPause.text = getString(R.string.button_pause)
         }
     }
 
